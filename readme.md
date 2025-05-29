@@ -1,17 +1,37 @@
-server and agents hold endpoints
+A poor attempt to do coordination between k8s clusters(In Progress). 
 
-1. server and agents holds the same text-secret, keep it secret
-2. request have to be signed with the secret
+# Setup
+Central requires etcd running at `localhost:2379`. See more details after config files are generated.
+## With justfile
+```bash
+just gen-ca
+just gen-central
+just gen-agent
+just gen-grpc
 
-1. openssl genrsa -out ca.key 4096
-2. openssl req -x509 -new -nodes -key ca.key -sha256 -days 3650 -out ca.crt
+go run ./cmd/central serve # start central controller
+go run ./cmd/agent serve # start agent controller
+```
+## Without justfile
+Well, you can just copy the commands from the justfile and run them manually.
 
-3. openssl genrsa -out server.key 4096
-4. openssl req -new -key server.key -out server.csr
-5. openssl x509 -req -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial \
-  -out server.crt -days 3650 -sha256
+# Code Overview
+Uses grpc to communicate between central and remote agents. 
+Central have a single grpc server and multiple grpc clients, 
+one for each remote agent.
+Agents each have a grpc server and a grpc client to communicate with the central agent.
 
-6. openssl genrsa -out agent.key 4096
-7. openssl req -new -key agent.key -out agent.csr
-8. openssl x509 -req -in agent.csr -CA ca.crt -CAkey ca.key -CAcreateserial \
-  -out agent.crt -days 3650 -sha256
+Agent sends heartbeats regularly to the central agent to prove 
+liveness. 
+
+# Interaction
+## Central
+```bash
+go run ./cmd/central status
+```
+
+## Agent
+```bash
+go run ./cmd/agent status
+go run ./cmd/agent pods
+```

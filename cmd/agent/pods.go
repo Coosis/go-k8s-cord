@@ -14,8 +14,8 @@ import (
 )
 
 var podsCmd = &cobra.Command{
-	Use: "status",
-	Short: "list status of the agent",
+	Use: "pods",
+	Short: "list pods of the agent",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		AgentServerConfigSetup()
 		config := NewAgentConfig()
