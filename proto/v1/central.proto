@@ -1,0 +1,43 @@
+option go_package = "central/v1";
+message HeartbeatRequest {
+  // The ID of the agent sending the heartbeat.
+  required string agent_id = 1;
+  required string agent_name = 2;
+  // The timestamp of the heartbeat in seconds since epoch.
+  required int64 timestamp = 3;
+  // The gRPC address of the agent(so agents can easily rotate).
+  required string agent_grpc_endpoint = 4;
+  optional string status = 5; // Optional status message
+}
+
+message HeartbeatResponse {
+  // Acknowledgment of the heartbeat.
+  required bool success = 1;
+  // ID of the agent that sent the heartbeat.
+  required string id = 2;
+  required int64 timestamp = 3;
+  // Optional message for additional context
+  optional string message = 4; 
+}
+
+message RegisterAgentRequest {
+  // The gRPC address of the agent(so server can call back agent).
+  required string agent_grpc_endpoint = 1;
+}
+
+message RegisterAgentResponse {
+  // Acknowledgment of the agent registration.
+  required bool success = 1;
+  required string id = 2;
+  // The name of the agent that was registered in seconds since epoch.
+  required int64 timestamp = 3;
+  // Optional message for additional context
+  optional string message = 4;
+}
+
+service CentralService {
+  // Sends a heartbeat signal to the server.
+  rpc SendHeartbeat(HeartbeatRequest) returns (HeartbeatResponse);
+  // Registers an agent with the central server.
+  rpc RegisterAgent(RegisterAgentRequest) returns (RegisterAgentResponse);
+}

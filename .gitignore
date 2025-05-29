@@ -1,0 +1,12 @@
+.DS_Store
+*.crt
+*.key
+*.srl
+*.csr
+compose.yaml
+deployment.yaml
+
+agent_config.yaml
+central_config.yaml
+
+internal/pb

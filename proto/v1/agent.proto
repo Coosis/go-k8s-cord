@@ -1,0 +1,41 @@
+option go_package = "agent/v1";
+message TriggerCICDHookRequest {}
+message TriggerCICDHookResponse {
+  // Acknowledgment of the CICD hook trigger.
+  required bool success = 1;
+  required string id = 2;
+  required string AgentName = 3;
+  required int64 Timestamp = 4;
+  optional string Status = 5;
+}
+
+message ContainerSnapshot {
+  optional string name = 1;
+  optional string image = 2;
+}
+message PodMetadata {
+  required string name = 1;
+  required string namespace = 2;
+  required string uid = 3;
+  required string api_version = 4;
+  required int64 creation_timestamp = 5; // Unix timestamp
+  required int64 deletion_timestamp = 6; // Unix timestamp
+  required int64 deletion_grace_period_seconds = 7;
+  required string node_name = 8;
+  required string phase = 9;
+  required string pod_ip = 10;
+  
+  repeated ContainerSnapshot containers = 11;
+
+}
+message ListPodsRequest {}
+message ListPodsResponse {
+  repeated PodMetadata pods = 1;
+}
+
+service AgentService {
+  // Sends a request to trigger a CICD hook.
+  rpc TriggerCICDHook(TriggerCICDHookRequest) returns (TriggerCICDHookResponse);
+
+  rpc ListPods(ListPodsRequest) returns (ListPodsResponse);
+}
