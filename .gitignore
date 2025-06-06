@@ -5,6 +5,9 @@
 *.csr
 compose.yaml
 deployment.yaml
+container/
+deployments/
+agent_deployments/
 
 agent_config.yaml
 central_config.yaml

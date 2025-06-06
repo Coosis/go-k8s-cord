@@ -1,0 +1,39 @@
+{{ define "Body" }}
+<div id="agent-header">
+  <h1>{{ .AgentTitle }}: {{ .HashMatch }}</h1>
+</div>
+<div class="split"
+  hx-get="/agent/{{ .AgentID }}/deployments"
+  hx-trigger="load"
+  hx-target="#agent-deployments"
+  hx-swap="innerHTML"
+  id="agent-info">
+  <div class="split-pane">
+    <h2>Active Deployments</h2>
+    <div id="agent-deployments"></div>
+  </div>
+
+  <div style="width: 2vh;"></div>
+
+  <div class="split-pane">
+    <h2>Available Deployment Files</h2>
+    <div>
+      <ul>
+        {{ range $val := .DeploymentFiles }}
+        <li class="file-entry">
+          <h3>{{ $val }}</h3>
+          <button
+            hx-post="/agent/{{ $.AgentID }}/deployments/apply"
+            hx-vals='{"deployment_files":["{{ $val }}"]}'
+            hx-target="#agent-deployments"
+            hx-swap="innerHTML"
+            class="delete-file-button">
+            Apply
+          </button>
+        </li>
+        {{ end }}
+      </ul>
+    </div>
+  </div>
+</div>
+{{ end }}

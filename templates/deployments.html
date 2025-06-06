@@ -1,0 +1,32 @@
+{{ define "Body" }}
+<div id="upload-div">
+  <div>
+    <div id="upload-form-container">
+      <h1>Upload Deployment File</h1>
+      <form
+        enctype="multipart/form-data"
+        method="POST"
+        hx-post="/deployments/upload"
+        hx-encoding="multipart/form-data"
+        hx-target="#file-viewer"
+        hx-swap="innerHTML"
+        id="upload-form">
+        <input type="file" name="files" multiple required />
+        <button type="submit">
+          Upload
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="split-pane">
+    <div 
+      hx-get="/deployments/list"
+      hx-trigger="load"
+      hx-target="#file-viewer"
+      hx-swap="innerHTML"
+      id="file-viewer">
+    </div>
+  </div>
+</div>
+{{ end }}

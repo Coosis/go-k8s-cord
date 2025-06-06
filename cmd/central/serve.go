@@ -2,14 +2,20 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"os/signal"
 
-	. "github.com/Coosis/go-k8s-cord/internal/central/server"
-	log "github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/spf13/cobra"
+	. "github.com/Coosis/go-k8s-cord/internal/central/server"
+
+	log "github.com/sirupsen/logrus"
+)
+
+var (
+	WEB_ENDPOINT = "http://localhost%s"
 )
 
 var serveCmd = &cobra.Command{
@@ -18,7 +24,6 @@ var serveCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		s, err := NewCentralServer()
 		if err != nil {
-			log.Error("Failed to create central server:", err)
 			return err
 		}
 
@@ -31,10 +36,8 @@ var serveCmd = &cobra.Command{
 		})
 
 		if err := g.Wait(); err != nil {
-			log.Fatal("Server shutdown due to error:", err)
+			return fmt.Errorf("server error: %w", err)
 		}
-
-		log.Info("Shutting down server...")
 
 		return nil
 	},

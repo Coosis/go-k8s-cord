@@ -1,3 +1,4 @@
+// agent register grpc server-side implementation
 package server
 
 import (

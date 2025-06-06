@@ -1,3 +1,4 @@
+// agent heartbeat grpc server-side implementation
 package server
 
 import (
@@ -5,12 +6,15 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Coosis/go-k8s-cord/internal/central/model"
-	pbc "github.com/Coosis/go-k8s-cord/internal/pb/central/v1"
 	"github.com/gogo/protobuf/proto"
-	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+
+	log "github.com/sirupsen/logrus"
+
+	. "github.com/Coosis/go-k8s-cord/internal/central/model"
+
+	pbc "github.com/Coosis/go-k8s-cord/internal/pb/central/v1"
 )
 
 // Server's implementation for receiving heartbeats from agents.
@@ -39,7 +43,7 @@ func(s *CentralServer) SendHeartbeat(
 		if err != nil {
 			return nil, fmt.Errorf("failed to create gRPC connection to agent: %w", err)
 		}
-		s.agents[idstr] = &model.AgentMetadata{
+		s.agents[idstr] = &AgentMetadata{
 			Name: req.GetAgentName(), // Set the agent name from the request
 			GrpcEndpoint: req.GetAgentGrpcEndpoint(),
 			AgentConn: conn, // Store the gRPC connection
@@ -51,7 +55,9 @@ func(s *CentralServer) SendHeartbeat(
 		if s.agents[idstr].GrpcEndpoint != req.GetAgentGrpcEndpoint() {
 			// If the gRPC endpoint has changed, we need to create a new connection
 			log.Debugf("Agent %s gRPC endpoint changed, updating connection", idstr)
-			s.agents[idstr].AgentConn.Close() // Close the old connection
+			if s.agents[idstr].AgentConn != nil {
+				s.agents[idstr].AgentConn.Close() // Close the old connection
+			}
 			cred := credentials.NewTLS(s.tlsConfig)
 			// Create a gRPC connection to the agent
 			conn, err := grpc.NewClient(req.GetAgentGrpcEndpoint(), grpc.WithTransportCredentials(cred))

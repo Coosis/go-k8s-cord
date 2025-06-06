@@ -1,0 +1,23 @@
+<ul>
+  {{ range $i, $dep := .Deployments }}
+  <li>
+    <strong>{{ $dep.name }}</strong> - {{ $dep.uid }}
+    <ul>
+      <li>Api Version: {{ index $dep "apiVersion" }}</li>
+      <li>Available Replicas: {{ index $dep "availableReplicas" }}</li>
+      <li>Replicas: {{ index $dep "replicas" }}</li>
+      <li>Ready Replicas: {{ index $dep "readyReplicas" }}</li>
+      <li>Creation Timestamp: {{ index $dep "creationTimestamp" }}</li>
+      <li>Updated Replicas: {{ index $dep "updatedReplicas" }}</li>
+    </ul>
+    <button
+      hx-post="/agent/{{ $.AgentID }}/deployments/remove"
+      hx-vals='{"deployment_files":["{{ $dep.name }}"]}'
+      hx-target="#agent-deployments"
+      hx-swap="innerHTML"
+      class="agent-delete-deployment-button">
+      Delete Deployment
+    </button>
+  </li>
+  {{ end }}
+</ul>

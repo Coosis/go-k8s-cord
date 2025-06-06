@@ -1,0 +1,15 @@
+{{ define "Body" }}
+  {{ range $i, $agent := .Agents }}
+    <a href="/agent/{{ $agent.id }}" class="agent-card">
+      <div>
+        <h1>{{ $agent.name }}</h1>
+        {{ $agent.id }}
+        {{ if eq $agent.status "online" }}
+          <h2 class="online">{{ $agent.status }}</h2>
+        {{ else }}
+          <h2 class="offline">{{ $agent.status }}</h2>
+        {{ end }}
+      </div>
+    </a>
+  {{ end }}
+{{ end }}

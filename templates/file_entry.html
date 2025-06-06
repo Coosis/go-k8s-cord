@@ -1,0 +1,15 @@
+<ul>
+  {{ range $i, $dep := .Deployments }}
+  <li>
+    <strong>{{ $dep }}</strong>
+    <button
+      hx-post="/deployments/delete"
+      hx-vals='{"filename":["{{ $dep }}"]}'
+      hx-target="#file-viewer"
+      hx-swap="innerHTML"
+      class="agent-delete-deployment-button">
+      Delete Deployment
+    </button>
+  </li>
+  {{ end }}
+</ul>

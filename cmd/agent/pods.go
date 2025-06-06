@@ -1,16 +1,15 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
-	"os"
-
-	log "github.com/sirupsen/logrus"
 
 	"github.com/spf13/cobra"
-	. "github.com/Coosis/go-k8s-cord/internal/agent/server"
+
 	. "github.com/Coosis/go-k8s-cord/internal/agent/model"
+
+	pba "github.com/Coosis/go-k8s-cord/internal/pb/agent/v1"
 )
 
 var podsCmd = &cobra.Command{
@@ -22,36 +21,38 @@ var podsCmd = &cobra.Command{
 		if config.Addr == ADDR_PLACEHOLDER {
 			return fmt.Errorf(AGENT_CONFIG_NOT_SET)
 		}
-		addr := fmt.Sprintf("http://%s%s/livez", config.Addr, config.HTTPSPort)
+		addr := fmt.Sprintf("http://%s%s/pods/list", config.Addr, config.HTTPSPort)
 		rasp, err := http.Get(addr)
 		if err != nil {
-			log.Error("Failed to get status: ", err)
 			return err
 		}
 		defer rasp.Body.Close()
 		if rasp.StatusCode != http.StatusOK {	
-			log.Error("Failed to get status, status code: ", rasp.StatusCode)
 			return fmt.Errorf("failed to get status, status code: %d", rasp.StatusCode)
 		}
 
-		txt, err := io.ReadAll(rasp.Body)
-		if err != nil {
-			log.Error("Failed to read response body: ", err)
-			return err
+		var pods []*pba.PodMetadata
+		if err := json.NewDecoder(rasp.Body).Decode(&pods); err != nil {
+			return fmt.Errorf("failed to decode response: %w", err)
 		}
 
-		if len(txt) == 0 {
-			log.Info("No status information available")
+		if len(pods) == 0 {
 			return nil
 		}
-		log.Debug("Status response: ", string(txt))
+
+		for _, pod := range pods {
+			fmt.Printf(
+				"Pod Name: %s, Namespace: %s, Status: %s\n",
+				*pod.Name,
+				*pod.Namespace,
+				*pod.Uid,
+			)
+		}
 
 		return nil
 	},
 }
 
 func init() {
-	log.SetLevel(log.DebugLevel)
-	log.SetOutput(os.Stdout)
 	rootCmd.AddCommand(podsCmd)
 }

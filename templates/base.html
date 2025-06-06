@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>go-k8s-cord</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <script src="https://unpkg.com/htmx.org@1.9.2"></script>
+</head>
+<body>
+  <div id="main-container">
+    <div id="sidebar">
+      <a href="/">
+        <button>Home</button>
+      </a>
+      <a href="/status">
+        <button>Status</button>
+      </a>
+      <a href="/deployments">
+        <button>Deployment Files</button>
+      </a>
+      <a href="/agent">
+        <button>Agent</button>
+      </a>
+    </div>
+
+    <div id="content">
+      {{ template "Body" . }}
+    </div>
+  </div>
+</body>
+</html>

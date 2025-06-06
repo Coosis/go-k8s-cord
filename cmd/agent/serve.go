@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"net/http"
 	"os"
 	"os/signal"
 	"time"
@@ -11,6 +10,7 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	. "github.com/Coosis/go-k8s-cord/internal/agent/server"
+	. "github.com/Coosis/go-k8s-cord/internal/agent/model"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -24,6 +24,8 @@ var serveCmd = &cobra.Command{
 			return err
 		}
 
+		cfg := GetAgentConfig()
+
 		ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, os.Kill)
 		defer stop()
 
@@ -33,7 +35,7 @@ var serveCmd = &cobra.Command{
 		})
 
 		g.Go(func() error {
-			ticker := time.NewTicker(time.Second * time.Duration(s.Config.HeartbeatInterval))
+			ticker := time.NewTicker(time.Second * time.Duration(cfg.HeartbeatInterval))
 			defer ticker.Stop()
 			for {
 				select {
@@ -41,7 +43,9 @@ var serveCmd = &cobra.Command{
 					log.Debug("Sending heartbeat...")
 					err := s.Heartbeat(ctx)
 					if err != nil {
-						return err
+						log.Error("Failed to send heartbeat:", err)
+					} else {
+						log.Debug("Heartbeat sent successfully")
 					}
 				case <-ctx.Done():
 					log.Debug("Stopping heartbeat...")
@@ -68,9 +72,4 @@ func init() {
 	log.SetLevel(log.DebugLevel)
 	log.SetOutput(os.Stdout)
 	rootCmd.AddCommand(serveCmd)
-}
-
-
-func check_status(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("I AM ALIVE\n"))
 }

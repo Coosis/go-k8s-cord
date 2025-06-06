@@ -1,0 +1,8 @@
+{{ define "Body" }}
+<ul 
+  hx-get="/status/list"
+  hx-trigger="load"
+  hx-target="#status-list"
+  hx-swap="innerHTML"
+  id="status-list"></ul>
+{{ end }}

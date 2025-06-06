@@ -4,9 +4,9 @@ message TriggerCICDHookResponse {
   // Acknowledgment of the CICD hook trigger.
   required bool success = 1;
   required string id = 2;
-  required string AgentName = 3;
-  required int64 Timestamp = 4;
-  optional string Status = 5;
+  required string agent_name = 3;
+  required int64 timestamp = 4;
+  optional string status = 5;
 }
 
 message ContainerSnapshot {
@@ -33,9 +33,47 @@ message ListPodsResponse {
   repeated PodMetadata pods = 1;
 }
 
+message DeploymentMetadata {
+  required string api_version = 1;
+  required string uid = 2;
+  required string name = 3;
+  required int32 replicas = 4;
+  required int32 ready_replicas = 5;
+  required int32 available_replicas = 6;
+  required int32 updated_replicas = 7;
+  required int64 creation_timestamp = 8;
+}
+message ListDeploymentsRequest {}
+message ListDeploymentsResponse {
+  repeated DeploymentMetadata deployments = 1;
+}
+
+message ApplyDeploymentsRequest {
+  repeated string deployment_name = 1;
+}
+message ApplyDeploymentsResponse {
+  required bool success = 1;
+}
+
+message RemoveDeploymentsRequest {
+  repeated string deployment_name = 1;
+}
+message RemoveDeploymentsResponse {
+  required bool success = 1;
+}
+
+message GetDeploymentsHashRequest {}
+message GetDeploymentsHashResponse {
+  required string hash = 1;
+}
+
 service AgentService {
   // Sends a request to trigger a CICD hook.
   rpc TriggerCICDHook(TriggerCICDHookRequest) returns (TriggerCICDHookResponse);
 
   rpc ListPods(ListPodsRequest) returns (ListPodsResponse);
+  rpc ListDeployments(ListDeploymentsRequest) returns (ListDeploymentsResponse);
+  rpc GetDeploymentsHash(GetDeploymentsHashRequest) returns (GetDeploymentsHashResponse);
+  rpc ApplyDeployments(ApplyDeploymentsRequest) returns (ApplyDeploymentsResponse);
+  rpc RemoveDeployments(RemoveDeploymentsRequest) returns (RemoveDeploymentsResponse);
 }
