@@ -9,6 +9,16 @@ Setup some ci/cd pipeline to have the deployment repository synced across all ag
 central(because central checks git hash to determine if deployment files are up to date).
 Then fill in the relevant fields in the config files on both central and agent controllers.
 
+## !! Optional
+If only testing locally and you don't want to jump through all this ci/cd hoops, 
+you can just manually copy the repository like:
+```bash
+cp -r deployments agent_deployments
+```
+And just pretend that the repository is synced, then continuing.
+For speed, also consider commenting out the git push part, that takes a while 
+and is completely unnecessary for local testing.
+
 ## Availability
 Make sure central and agent can reach each other with url.
 
